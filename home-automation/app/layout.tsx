@@ -31,14 +31,6 @@ export default function RootLayout({
       <body
         className={`bg-slate-700 p-4 text-white ${suse.className} ${heading.variable} antialiased`}
       >
-        <nav className="flex items-center border-b-[1px]">
-          <Link className="p-2" href="/">
-            Home
-          </Link>
-          <Link className="p-2" href="/device_statuses">
-            Device status
-          </Link>
-        </nav>
         {children}
       </body>
     </html>
