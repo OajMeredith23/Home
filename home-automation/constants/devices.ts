@@ -15,7 +15,7 @@ export interface IDevice {
 export const devices: IDevice[] = [
      {
         name: 'pico',
-        address: 'http://192.168.1.18',
+        address: 'http://192.168.1.12',
         controls: [
             {
                 type: 'toggle'
@@ -30,8 +30,10 @@ export const devices: IDevice[] = [
     {
         name: 'made-up-thing',
         address: 'http://notanaddress.com',
-        controls:[ {
-            type: 'toggle'
-            }], 
+        controls:[
+            {
+                type: 'toggle'
+            }
+        ], 
     }
 ]

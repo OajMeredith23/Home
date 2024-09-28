@@ -1,7 +1,5 @@
 import type { Metadata } from "next";
 import { Sora} from 'next/font/google'
-import Link from 'next/link'
-import localFont from "next/font/local";
 import "./globals.css";
 
 const suse = Sora({
@@ -29,7 +27,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`bg-slate-700 p-4 text-white ${suse.className} ${heading.variable} antialiased`}
+        className={`bg-background p-4 ${suse.className} ${heading.variable} antialiased`}
       >
         {children}
       </body>
