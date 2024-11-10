@@ -1,46 +1,54 @@
+import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Switch } from "@/components/ui/switch"
+import { Slider } from "@/components/ui/slider"
 import { IDevice } from "@/constants/devices"
-import {useDevice} from "@/utils/control-device"
+import { useDevice } from "@/utils/control-device"
+import { RefreshCw } from "lucide-react"
 
 export const DeviceControlPanel = ({controls, address, ...props}: IDevice) => {
 
-    // console.log({props})
     const {controlDevice, checkStatus, loading, toggle, scale, online, error} = useDevice(address)
-    // console.log({toggle, scale})
-    return (
-        <div className="space-y-2xs bg-secondary p-s rounded-[8px]">   
-            <section className="flex items-center gap-s">
-                <div className={`rounded-full w-[20px] h-[20px] ${online === false &&'bg-red-500'} ${online === true &&'bg-green-500'} ${online === null &&'bg-gray-500'}`}/>
-                    <p className="text-step-1 font-heading">{props.name}</p>
-            </section>
-            <Button onClick={() => checkStatus(address)}>Check status</Button>
-            {loading && <p>Loading...</p>}
-            <section className="space-y-2xs">
-            {online && controls?.map((control, i) => {
-                console.log({control})
 
+    return (
+        <div className="bg-secondary p-s rounded-[8px] flex items-center gap-m">   
+                <Button className="p-0" variant="ghost" onClick={() => checkStatus(address)}>
+                    <RefreshCw color={loading ? 'grey' : !online ? 'red' : 'green'}/>
+                </Button>
+                <p className="text-step-1 font-heading">{props.name}</p>
+            {online && controls?.map((control, i) => {
                 switch(control.type){
-                    case 'toggle':
-                       return <Toggle
+                        case 'toggle':
+                        return <Switch 
                                 key={i}
-                                checked={toggle}
-                                handleClick={(e) => controlDevice({toggle: e, scale})}
-                                />
-                        case 'scale': 
-                        return <Scale 
-                                key={i}
-                                disabled={toggle === 'off'}
-                                handleChange={(e) => controlDevice({toggle, scale: e})}
-                                range={control.range}
-                                defaultValue={scale}
+                                onClick={() => controlDevice({toggle: toggle === 'on' ? 'off' : 'on', scale})}
+                                checked={toggle === 'on'}
                             />
+                        case 'scale': 
+                        return <input type="range" onChange={(e) => controlDevice({toggle, scale: e.target.value})} min={control.range[0]} max={control.range[1]} value={scale}></input>
+                        // <Slider 
+                        //         key={i} 
+                        //         // disabled={toggle === 'off'}
+                        //         // onValueChange={(e) => console.log(e)}
+                        //         onValueCommit={(e) => controlDevice({toggle, scale: e[0].toString()})}
+                        //         min={control.range[0]}
+                        //         max={control.range[1]}
+                        //         // defaultValue={[s]}
+                        //         // defaultValue={scale}
+                        //         // range={control.range}
+                        //     />
+                        // <Scale 
+                        //         key={i}
+                        //         disabled={toggle === 'off'}
+                        //         handleChange={(e) => controlDevice({toggle, scale: e})}
+                        //         range={control.range}
+                        //         defaultValue={scale}
+                        //     />
                     default: {
                         return <></>
                     }
                     }
             })}
-            </section>
            
         </div> 
     )

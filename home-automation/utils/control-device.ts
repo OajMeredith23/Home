@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { TDeviceControl } from "@/constants/devices";
+import {socket} from "@/utils/socket"
 interface IControlDevice {
     toggle: 'on' | 'off',
     scale: string
@@ -19,11 +20,12 @@ export const useDevice = (address: string) => {
 
     const [loading, setLoading] = useState(true)
     const [online, setOnline] = useState<boolean | null>(null)
-    const [toggle, setToggle] = useState<IControlDevice['toggle']>('off');
+    const [toggle, setToggle] = useState<IControlDevice['toggle']>('on');
     const [scale, setScale] = useState<IControlDevice['scale']>('1');
     const [error, setError] = useState<string>('');
 
-    
+   
+
     const checkStatus = async (address: string) => {
         console.log("checking...")
         setLoading(true)
@@ -46,6 +48,17 @@ export const useDevice = (address: string) => {
 
      console.log(`${address} is ${online ? 'online' : 'offline'}`);
 
+     socket.on('device_state', (device_state) => {
+        console.log("device_state", device_state)
+        if(device_state.hasOwnProperty('toggle')){
+            setToggle(device_state.toggle)
+        }
+        if(device_state.hasOwnProperty('scale')){
+            setScale(device_state.scale)
+        }
+        // setMessages((prevMessages) => [...prevMessages, message]);
+      });
+
      const controlDevice = async({
         toggle,
         scale
@@ -56,8 +69,9 @@ export const useDevice = (address: string) => {
             if(toggle === 'off') scale = '0'
             const req = await fetch(`${address}/?toggle=${toggle}&scale=${scale}`, { signal: AbortSignal.timeout(5000) })
             const res = await req.json()
-            setToggle(toggle)
-            setScale(scale)
+            socket.emit('device_state', res)
+            // setToggle(toggle)
+            // setScale(scale)
             return res
         } catch (error: any) {
             console.warn("device error error", error)

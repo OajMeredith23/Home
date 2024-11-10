@@ -21,6 +21,9 @@ app.prepare().then(() => {
         socket.on('message', (message) => {
             io.emit('message', message);
         });
+        socket.on('device_state', (message) => {
+            io.emit('device_state', message);
+        });
 
         // Clean up the socket on disconnect
         socket.on('disconnect', () => {

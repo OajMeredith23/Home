@@ -16,7 +16,6 @@ export default function Home() {
   useEffect(() => {
     if (socket.connected) {
       onConnect();
-      {socket.io.opts.hostname && setHostname(socket.io.opts.hostname)}
     }
     console.log("messages", messages)
 
@@ -25,7 +24,7 @@ export default function Home() {
     function onConnect() {
       setIsConnected(true);
       setTransport(socket.io.engine.transport.name);
-      
+      setHostname(socket.io.opts.hostname || '')
       // Listen for incoming messages
       socket.io.engine.on("upgrade", (transport) => {
         setTransport(transport.name);
