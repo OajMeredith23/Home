@@ -25,16 +25,25 @@ export const useDevice = (address: string) => {
     const [error, setError] = useState<string>('');
 
    
+    console.log({address})
 
     const checkStatus = async (address: string) => {
         console.log("checking...")
         setLoading(true)
         try {
-            const req = await fetch(`${address}/?status_request=true`)
+            // const req = await fetch(`${address}/?status_request=true`)
+            const req = await fetch(`http://raspberrypi.local:8000/status-request`, {
+                body: JSON.stringify({
+                    address
+                })
+            })
+            const res = await req.json()
+            console.log("REs", res)
             setOnline(true)
             setLoading(false)
             return true
         } catch (error: any) {
+            console.log("Status error", error)
             setOnline(false)
             setLoading(false)
             console.warn(address, error.message)
