@@ -25,21 +25,24 @@ export const useDevice = (address: string) => {
     const [error, setError] = useState<string>('');
 
    
-    console.log({address})
 
     const checkStatus = async (address: string) => {
         console.log("checking...")
         setLoading(true)
         try {
             // const req = await fetch(`${address}/?status_request=true`)
-            const req = await fetch(`http://raspberrypi.local:8000/status-request`, {
+            const req = await fetch(`https://api.panthabunny.co.uk/status-request`, {
+                method: 'POST',
+                headers: {
+                    "Content-Type": "application/json",
+                  },
                 body: JSON.stringify({
                     address
                 })
             })
             const res = await req.json()
-            console.log("REs", res)
-            setOnline(true)
+            console.log("res", address, res.success, res.device_response)
+            setOnline(res.success)
             setLoading(false)
             return true
         } catch (error: any) {
@@ -55,10 +58,10 @@ export const useDevice = (address: string) => {
         checkStatus(address)
     }, [])
 
-     console.log(`${address} is ${online ? 'online' : 'offline'}`);
+    //  console.log(`${address} is ${online ? 'online' : 'offline'}`);
 
      socket.on('device_state', (device_state) => {
-        console.log("device_state", device_state)
+        // console.log("device_state", device_state)
         if(device_state.hasOwnProperty('toggle')){
             setToggle(device_state.toggle)
         }
@@ -72,13 +75,22 @@ export const useDevice = (address: string) => {
         toggle,
         scale
       }: IControlDevice) => {
-        console.log("going...", toggle)
         try {
             
             if(toggle === 'off') scale = '0'
-            const req = await fetch(`${address}/?toggle=${toggle}&scale=${scale}`, { signal: AbortSignal.timeout(5000) })
+            const req= await fetch('https://api.panthabunny.co.uk/control-pico',{
+                method: 'POST',
+                headers: {
+                    "Content-Type": "application/json",
+                  },
+                body: JSON.stringify({
+                    address, toggle, scale
+                })
+            })
+            // const req = await fetch(`${address}/?toggle=${toggle}&scale=${scale}`, { signal: AbortSignal.timeout(5000) })
             const res = await req.json()
-            socket.emit('device_state', res)
+            console.log("control res", res.device_response)
+            socket.emit('device_state', res.device_response)
             // setToggle(toggle)
             // setScale(scale)
             return res
