@@ -18,9 +18,6 @@ app.prepare().then(() => {
         console.log(`Socket ${socket.id} connected.`);
 
         // Listen for incoming messages and broadcast to all clients
-        socket.on('message', (message) => {
-            io.emit('message', message);
-        });
         socket.on('device_state', (message) => {
             io.emit('device_state', message);
         });

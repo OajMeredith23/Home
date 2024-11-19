@@ -21,11 +21,25 @@ const fetch = (...args) => import('node-fetch').then(({ default: fetch }) => fet
 dotenv_1.default.config();
 const app = (0, express_1.default)();
 const port = process.env.PORT || 3000;
-app.use((0, cors_1.default)());
+const allowedOrigins = ['http://localhost:3000', 'http://192.168.1.214:3000', 'https://home.panthabunny.co.uk'];
+app.use((0, cors_1.default)({
+    origin: function (origin, callback) {
+        // allow requests with no origin 
+        // (like mobile apps or curl requests)
+        if (!origin)
+            return callback(null, true);
+        if (allowedOrigins.indexOf(origin) === -1) {
+            const msg = 'The CORS policy for this site does not ' +
+                'allow access from the specified Origin.';
+            return callback(new Error(msg), false);
+        }
+        return callback(null, true);
+    }
+}));
 app.use(body_parser_1.default.urlencoded({ extended: true }));
 app.use(body_parser_1.default.json());
 app.get("/", (req, res) => {
-    res.send("Express + TypeScript Server");
+    res.send("Home Server");
 });
 app.listen(port, () => {
     console.log(`[server]: Server is running at http://localhost:${port}`);
@@ -38,7 +52,7 @@ app.post("/status-request", (req, res) => __awaiter(void 0, void 0, void 0, func
         const pico_response = yield fetch(`${req.body.address}/?status_request=truezz`, {
             method: 'GET',
             headers: {
-                "Content-Type": "text/html",
+                "Content-Type": "application/json",
             },
         });
         console.log("header", [...pico_response.headers]);
@@ -47,8 +61,9 @@ app.post("/status-request", (req, res) => __awaiter(void 0, void 0, void 0, func
             // Handle HTTP errors
             throw new Error(`HTTP error! Status: ${pico_response.status} - ${pico_response.statusText}`);
         }
-        const pico_json = yield pico_response.text();
-        res.json({ success: true, device_response: "" });
+        const pico_json = yield pico_response.json();
+        console.log("Response", pico_json);
+        res.json({ success: true, device_response: pico_json });
     }
     catch (error) {
         console.error("ERR", req.body.address, error);
@@ -56,9 +71,32 @@ app.post("/status-request", (req, res) => __awaiter(void 0, void 0, void 0, func
     }
     // res.sendStatus(200)
 }));
-app.get("/control-pico", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    console.log("req", req.params);
-    //  const response = await fetch('http://192.168.1.12', )
-    console.log("hello, doing the thing to the pico ok.");
-    res.send({ success: true });
+app.post("/control-pico", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    console.log("control pico req", req.body);
+    if (!req.body.address)
+        res.send({ success: true });
+    const { address, toggle = undefined, scale = undefined } = req.body;
+    const url = `${address}/?toggle=${toggle}&scale=${scale}`;
+    console.log("url", url);
+    try {
+        const pico_response = yield fetch(url, {
+            method: 'GET',
+            headers: {
+                "Content-Type": "application/json",
+            },
+        });
+        console.log("header", [...pico_response.headers]);
+        // Check for a non-200 response status
+        if (!pico_response.ok) {
+            // Handle HTTP errors
+            throw new Error(`HTTP error! Status: ${pico_response.status} - ${pico_response.statusText}`);
+        }
+        const pico_json = yield pico_response.json();
+        console.log("Response", pico_json);
+        res.json({ success: true, device_response: pico_json });
+    }
+    catch (error) {
+        console.error("ERR", req.body.address, error);
+        res.json({ success: false });
+    }
 }));

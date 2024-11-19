@@ -3,15 +3,16 @@ import express, { Express, Request, Response } from "express";
 import dotenv from "dotenv";
 import cors from 'cors'
 import bodyParser from 'body-parser';
+
+import { devices } from "./constants/initial-state";
+
 const fetch = (...args: [any, any]) =>
 	import('node-fetch').then(({default: fetch}) => fetch(...args));
 
 dotenv.config();
 
 const app: Express = express();
-const port = process.env.PORT || 3000;
-
-
+const port = process.env.PORT || 8000;
 
 const allowedOrigins = ['http://localhost:3000', 'http://192.168.1.214:3000','https://home.panthabunny.co.uk'];
 
@@ -21,10 +22,10 @@ app.use(cors({
   // (like mobile apps or curl requests)
   if(!origin) return callback(null, true);
   if(allowedOrigins.indexOf(origin) === -1){
-  const msg = 'The CORS policy for this site does not ' +
-  'allow access from the specified Origin.';
-  return callback(new Error(msg), false);
-  }
+    const msg = 'The CORS policy for this site does not ' +
+    'allow access from the specified Origin.';
+      return callback(new Error(msg), false);
+    }
   return callback(null, true);
   }
 }))
@@ -34,12 +35,17 @@ app.use(bodyParser.json());
 
 
 app.get("/", (req: Request, res: Response) => {
-  res.send("Express + TypeScript Server");
+  res.send("Home Server");
 });
 
 app.listen(port, () => {
   console.log(`[server]: Server is running at http://localhost:${port}`);
 });
+
+app.post('/device_state', async (req: Request, res: Response) => {
+
+  res.json(devices)
+})
 
 
 app.post("/status-request", async (req: Request, res: Response) => {
