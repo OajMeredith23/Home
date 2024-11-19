@@ -33,6 +33,7 @@ app.use(cors({
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
+app.locals.devices = devices
 
 app.get("/", (req: Request, res: Response) => {
   res.send("Home Server");
@@ -42,9 +43,8 @@ app.listen(port, () => {
   console.log(`[server]: Server is running at http://localhost:${port}`);
 });
 
-app.post('/device_state', async (req: Request, res: Response) => {
-
-  res.json(devices)
+app.get('/inital_state', async (req: Request, res: Response) => {
+  res.json(app.locals.devices)
 })
 
 
@@ -55,7 +55,7 @@ app.post("/status-request", async (req: Request, res: Response) => {
   if(!req.body.address) res.send({ success: true})
 
     try {
-      const pico_response = await fetch(`${req.body.address}/?status_request=truezz`, {
+      const pico_response = await fetch(`${req.body.address}/?status_request=true`, {
         method: 'GET',
         headers: {
           "Content-Type": "application/json",
@@ -69,8 +69,11 @@ app.post("/status-request", async (req: Request, res: Response) => {
         throw new Error(`HTTP error! Status: ${pico_response.status} - ${pico_response.statusText}`);
       }
       const pico_json = await pico_response.json()
-      console.log("Response", pico_json)
-      res.json({ success: true, device_response: pico_json })
+      if(pico_json && typeof pico_json === 'object' && pico_json.hasOwnProperty('state')){
+        console.log("STATE", (pico_json as any).state)
+        res.json({ success: true, device_response: (pico_json as any).state })
+
+      }
         
       } catch (error) {
         console.error("ERR",req.body.address, error)
@@ -81,8 +84,6 @@ app.post("/status-request", async (req: Request, res: Response) => {
 })
 
 app.post("/control-pico", async (req: Request, res: Response) => {
-
-  console.log("control pico req", req.body)
 
   if(!req.body.address) res.send({ success: true})
 
@@ -97,6 +98,7 @@ app.post("/control-pico", async (req: Request, res: Response) => {
         },
       })
 
+      
       console.log("header", [...pico_response.headers])
       // Check for a non-200 response status
       if (!pico_response.ok) {
@@ -105,7 +107,16 @@ app.post("/control-pico", async (req: Request, res: Response) => {
       }
       const pico_json = await pico_response.json()
       console.log("Response", pico_json)
-      res.json({ success: true, device_response: pico_json })
+      console.log("Response", pico_json)
+      console.log("IS", pico_json && typeof pico_json === 'object' && pico_json.hasOwnProperty('state'))
+
+      if(pico_json && typeof pico_json === 'object' && pico_json.hasOwnProperty('state')){
+        const deviceName = (pico_json as any).device
+        app.locals.devices[deviceName].state = (pico_json as any).state
+
+        console.log("NAME", deviceName, app.locals.devices)
+        res.json({ success: true, device_response: (pico_json as any).state, full: app.locals.devices })
+      }
         
       } catch (error) {
         console.error("ERR",req.body.address, error)

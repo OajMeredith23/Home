@@ -1,11 +1,7 @@
+"use client"
 import { useEffect, useMemo, useState } from "react";
-import { TDeviceControl } from "@/constants/devices";
+import { IDevice } from "@/constants/devices";
 import {socket} from "@/utils/socket"
-interface IControlDevice {
-    toggle: 'on' | 'off',
-    scale: string
-  }
-
 
 const checkStatus = async (address: string) => {
     try {
@@ -16,12 +12,11 @@ const checkStatus = async (address: string) => {
         return false
     }
 }
-export const useDevice = (address: string) => {
+export const useDevice = (address: string, initialState: IDevice['state']) => {
 
+    const [deviceState, setDeviceState] = useState(initialState)
     const [loading, setLoading] = useState(true)
     const [online, setOnline] = useState<boolean | null>(null)
-    const [toggle, setToggle] = useState<IControlDevice['toggle']>('on');
-    const [scale, setScale] = useState<IControlDevice['scale']>('1');
     const [error, setError] = useState<string>('');
 
    
@@ -30,7 +25,6 @@ export const useDevice = (address: string) => {
         console.log("checking...")
         setLoading(true)
         try {
-            // const req = await fetch(`${address}/?status_request=true`)
             const req = await fetch(`https://api.panthabunny.co.uk/status-request`, {
                 method: 'POST',
                 headers: {
@@ -41,7 +35,7 @@ export const useDevice = (address: string) => {
                 })
             })
             const res = await req.json()
-            console.log("res", address, res.success, res.device_response)
+            console.log("res", res, address, res.success, res.device_response)
             setOnline(res.success)
             setLoading(false)
             return true
@@ -58,26 +52,22 @@ export const useDevice = (address: string) => {
         checkStatus(address)
     }, [])
 
-    //  console.log(`${address} is ${online ? 'online' : 'offline'}`);
 
      socket.on('device_state', (device_state) => {
-        // console.log("device_state", device_state)
-        if(device_state.hasOwnProperty('toggle')){
-            setToggle(device_state.toggle)
+        console.log("received scoket", device_state)
+        if(Object.keys(device_state)[0] === address){
+            console.log("Received socket for:", address)
+            setDeviceState(device_state[address])
         }
-        if(device_state.hasOwnProperty('scale')){
-            setScale(device_state.scale)
-        }
-        // setMessages((prevMessages) => [...prevMessages, message]);
       });
 
      const controlDevice = async({
-        toggle,
-        scale
-      }: IControlDevice) => {
+        toggle = deviceState.toggle || "on",
+        scale = deviceState.scale || '0'
+      }: IDevice['state']) => {
+
         try {
             
-            if(toggle === 'off') scale = '0'
             const req= await fetch('https://api.panthabunny.co.uk/control-pico',{
                 method: 'POST',
                 headers: {
@@ -87,12 +77,10 @@ export const useDevice = (address: string) => {
                     address, toggle, scale
                 })
             })
-            // const req = await fetch(`${address}/?toggle=${toggle}&scale=${scale}`, { signal: AbortSignal.timeout(5000) })
             const res = await req.json()
-            console.log("control res", res.device_response)
-            socket.emit('device_state', res.device_response)
-            // setToggle(toggle)
-            // setScale(scale)
+            console.log("control res", {[address]: res.device_response})
+            socket.emit('device_state', {[address]: res.device_response})
+           
             return res
         } catch (error: any) {
             console.warn("device error error", error)
@@ -105,9 +93,8 @@ export const useDevice = (address: string) => {
         controlDevice,
         checkStatus,
         loading,
-        scale,
-        toggle,
         online,
-        error
+        error,
+        state: deviceState
       }
   }

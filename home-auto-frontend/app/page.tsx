@@ -1,21 +1,46 @@
-'use client'
-import {useState, useEffect} from 'react'
 import { devices } from "@/constants/devices"
 import { DeviceControlPanel } from "@/components/device-control-panel"
-import {socket} from "@/utils/socket"
+import { IDeviceJSON } from "@/constants/devices"
 
-export default function Home() {
+
+export default async function Home() {
     
 
+  try {
+    let data = await fetch('https://api.panthabunny.co.uk/inital_state')
+    let devicesz: IDeviceJSON = await data.json()
+    
+    const deviceNames = Object.keys(devicesz)
 
   return (
     <section className="space-y-xs-s py-l">
+      
+      <details>
+        <summary>
+        See state
+        </summary>
+          <pre>
+            {devicesz && JSON.stringify(devicesz, null, 2)}
+          </pre>
+      </details>
+     
 
-      {devices.map(device => {
+
+      {deviceNames.map(name => {
+        const device = devicesz[name]
         return (
           <DeviceControlPanel key={device.address} {...device}/>
         )
       })}
     </section>
   );
+
+  } catch (error) {
+
+    return <p>Didn't receive anything from the API :(</p>
+  }
+
+
+  
 }
+

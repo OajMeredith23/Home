@@ -17,10 +17,11 @@ const express_1 = __importDefault(require("express"));
 const dotenv_1 = __importDefault(require("dotenv"));
 const cors_1 = __importDefault(require("cors"));
 const body_parser_1 = __importDefault(require("body-parser"));
+const initial_state_1 = require("./constants/initial-state");
 const fetch = (...args) => import('node-fetch').then(({ default: fetch }) => fetch(...args));
 dotenv_1.default.config();
 const app = (0, express_1.default)();
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 8000;
 const allowedOrigins = ['http://localhost:3000', 'http://192.168.1.214:3000', 'https://home.panthabunny.co.uk'];
 app.use((0, cors_1.default)({
     origin: function (origin, callback) {
@@ -38,18 +39,22 @@ app.use((0, cors_1.default)({
 }));
 app.use(body_parser_1.default.urlencoded({ extended: true }));
 app.use(body_parser_1.default.json());
+app.locals.devices = initial_state_1.devices;
 app.get("/", (req, res) => {
     res.send("Home Server");
 });
 app.listen(port, () => {
     console.log(`[server]: Server is running at http://localhost:${port}`);
 });
+app.get('/inital_state', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    res.json(app.locals.devices);
+}));
 app.post("/status-request", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     console.log("req", req.body);
     if (!req.body.address)
         res.send({ success: true });
     try {
-        const pico_response = yield fetch(`${req.body.address}/?status_request=truezz`, {
+        const pico_response = yield fetch(`${req.body.address}/?status_request=true`, {
             method: 'GET',
             headers: {
                 "Content-Type": "application/json",
@@ -62,8 +67,10 @@ app.post("/status-request", (req, res) => __awaiter(void 0, void 0, void 0, func
             throw new Error(`HTTP error! Status: ${pico_response.status} - ${pico_response.statusText}`);
         }
         const pico_json = yield pico_response.json();
-        console.log("Response", pico_json);
-        res.json({ success: true, device_response: pico_json });
+        if (pico_json && typeof pico_json === 'object' && pico_json.hasOwnProperty('state')) {
+            console.log("STATE", pico_json.state);
+            res.json({ success: true, device_response: pico_json.state });
+        }
     }
     catch (error) {
         console.error("ERR", req.body.address, error);
@@ -93,7 +100,14 @@ app.post("/control-pico", (req, res) => __awaiter(void 0, void 0, void 0, functi
         }
         const pico_json = yield pico_response.json();
         console.log("Response", pico_json);
-        res.json({ success: true, device_response: pico_json });
+        console.log("Response", pico_json);
+        console.log("IS", pico_json && typeof pico_json === 'object' && pico_json.hasOwnProperty('state'));
+        if (pico_json && typeof pico_json === 'object' && pico_json.hasOwnProperty('state')) {
+            const deviceName = pico_json.device;
+            app.locals.devices[deviceName].state = pico_json.state;
+            console.log("NAME", deviceName, app.locals.devices);
+            res.json({ success: true, device_response: pico_json.state, full: app.locals.devices });
+        }
     }
     catch (error) {
         console.error("ERR", req.body.address, error);
