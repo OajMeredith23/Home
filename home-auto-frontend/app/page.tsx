@@ -2,6 +2,7 @@ import { devices } from "@/constants/devices"
 import { DeviceControlPanel } from "@/components/device-control-panel"
 import { IDeviceJSON } from "@/constants/devices"
 
+export const revalidate = 0;
 
 export default async function Home() {
     

@@ -79,7 +79,6 @@ app.post("/status-request", (req, res) => __awaiter(void 0, void 0, void 0, func
     // res.sendStatus(200)
 }));
 app.post("/control-pico", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    console.log("control pico req", req.body);
     if (!req.body.address)
         res.send({ success: true });
     const { address, toggle = undefined, scale = undefined } = req.body;
