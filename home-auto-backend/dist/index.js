@@ -22,7 +22,7 @@ const fetch = (...args) => import('node-fetch').then(({ default: fetch }) => fet
 dotenv_1.default.config();
 const app = (0, express_1.default)();
 const port = process.env.PORT || 8000;
-const allowedOrigins = ['http://localhost:3000', 'http://192.168.1.214:3000', 'https://home.panthabunny.co.uk'];
+const allowedOrigins = ['http://localhost:3000', 'http://192.168.1.214:3000', 'http://pi5.local:3000', 'https://home.panthabunny.co.uk'];
 app.use((0, cors_1.default)({
     origin: function (origin, callback) {
         // allow requests with no origin 

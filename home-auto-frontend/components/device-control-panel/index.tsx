@@ -34,7 +34,7 @@ export const DeviceControlPanel = ({controls, address, state: initialState, ...p
                                     checked={value === 'on'}
                                 />
                             case 'scale': 
-                            return <input key={i} type="range" onChange={(e) => controlDevice({scale: e.target.value})} min="0" max="100" value={value}></input>
+                            return <input key={i} type="range" onChange={(e) => controlDevice({scale: e.target.value})} min="0" max="150" value={value}></input>
                            
                         default: {
                             return <></>

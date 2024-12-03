@@ -14,7 +14,7 @@ dotenv.config();
 const app: Express = express();
 const port = process.env.PORT || 8000;
 
-const allowedOrigins = ['http://localhost:3000', 'http://192.168.1.214:3000','https://home.panthabunny.co.uk'];
+const allowedOrigins = ['http://localhost:3000', 'http://192.168.1.214:3000', 'http://pi5.local:3000', 'https://home.panthabunny.co.uk'];
 
 app.use(cors({
   origin: function(origin, callback){
