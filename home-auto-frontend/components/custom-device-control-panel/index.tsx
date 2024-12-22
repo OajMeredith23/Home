@@ -1,16 +1,14 @@
 "use client"
-import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Switch } from "@/components/ui/switch"
 import { Slider } from "@/components/ui/slider"
-import { IDeviceOld, IDevice } from "@/constants/devices"
-import { useDevice } from "@/utils/control-device"
+import {  IDevice } from "@/constants/devices"
+import { useCustomDevice } from "@/utils/useCustomDevice"
 import { RefreshCw } from "lucide-react"
 
-import { IDeviceJSON } from "@/constants/devices"
-export const DeviceControlPanel = ({controls, address, state: initialState, ...props}: IDevice) => {
+export const CustomDeviceControlPanel = ({ address, state: initialState, ...props}: IDevice) => {
 
-    const {controlDevice, checkStatus, loading, state, online, error} = useDevice(address, initialState)
+    const {controlDevice, checkStatus, loading, state, online } = useCustomDevice(address, initialState)
 
     if(!state) return <p>Couldn't get the device state, try refreshing...</p>
 

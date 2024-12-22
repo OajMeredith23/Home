@@ -1,6 +1,6 @@
-import { devices } from "@/constants/devices"
-import { DeviceControlPanel } from "@/components/device-control-panel"
-import { IDeviceJSON } from "@/constants/devices"
+import { CustomDeviceControlPanel } from "@/components/custom-device-control-panel"
+import { WledDeviceControlPanel } from "@/components/wled-control-panel";
+import { IDevice } from "@/constants/devices"
 
 export const revalidate = 0;
 
@@ -9,9 +9,9 @@ export default async function Home() {
 
   try {
     let data = await fetch('https://api.panthabunny.co.uk/inital_state')
-    let devicesz: IDeviceJSON = await data.json()
+    let devices: {[key: string]: IDevice} = await data.json()
     
-    const deviceNames = Object.keys(devicesz)
+    const deviceNames = Object.keys(devices)
 
   return (
     <section className="space-y-xs-s py-l">
@@ -21,17 +21,17 @@ export default async function Home() {
         See state
         </summary>
           <pre>
-            {devicesz && JSON.stringify(devicesz, null, 2)}
+            {devices && JSON.stringify(devices, null, 2)}
           </pre>
       </details>
      
 
 
       {deviceNames.map(name => {
-        const device = devicesz[name]
-        return (
-          <DeviceControlPanel key={device.address} {...device}/>
-        )
+        const device = devices[name]
+        return device.type === 'custom' ? (
+          <CustomDeviceControlPanel key={device.address} {...device}/>
+        ) : <WledDeviceControlPanel {...device} device_name={name}/>
       })}
     </section>
   );

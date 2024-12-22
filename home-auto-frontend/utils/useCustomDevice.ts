@@ -3,16 +3,16 @@ import { useEffect, useMemo, useState } from "react";
 import { IDevice } from "@/constants/devices";
 import {socket} from "@/utils/socket"
 
-const checkStatus = async (address: string) => {
-    try {
-        const req = await fetch(`${address}/?status_request=true`)
-        return true
-    } catch (error: any) {
-        console.warn(address, error.message)
-        return false
-    }
-}
-export const useDevice = (address: string, initialState: IDevice['state']) => {
+// const checkStatus = async (address: string) => {
+//     try {
+//         const req = await fetch(`${address}/?status_request=true`)
+//         return true
+//     } catch (error: any) {
+//         console.warn(address, error.message)
+//         return false
+//     }
+// }
+export const useCustomDevice = (address: string, initialState: IDevice['state']) => {
 
     const [deviceState, setDeviceState] = useState(initialState)
     const [loading, setLoading] = useState(true)
