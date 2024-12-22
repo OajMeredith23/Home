@@ -15,7 +15,6 @@ export default async function Home() {
 
   return (
     <section className="space-y-xs-s py-l">
-      
       <details>
         <summary>
         See state
@@ -24,14 +23,11 @@ export default async function Home() {
             {devices && JSON.stringify(devices, null, 2)}
           </pre>
       </details>
-     
-
-
       {deviceNames.map(name => {
         const device = devices[name]
         return device.type === 'custom' ? (
           <CustomDeviceControlPanel key={device.address} {...device}/>
-        ) : <WledDeviceControlPanel {...device} device_name={name}/>
+        ) : <WledDeviceControlPanel key={device.address} {...device} device_name={name}/>
       })}
     </section>
   );

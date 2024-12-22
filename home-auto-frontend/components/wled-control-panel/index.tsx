@@ -9,24 +9,29 @@ import { RefreshCw, CirclePowerIcon } from "lucide-react"
 
 export const WledDeviceControlPanel = ({ address, state: initialState, device_name,...props}: IDevice & {device_name: string}) => {
 
+    console.log({props})
     const {loading, online, checkStatus, deviceState, toggleWledOn } = useWledDevice(address, initialState, device_name)
 
     return (
-        <>
-        <div className="bg-secondary p-s rounded-[8px] flex items-center gap-m">   
-        
-                <Button className="p-0" variant="ghost" onClick={() => checkStatus(address)}>
-                    <RefreshCw color={loading ? 'grey' : !online ? 'red' : 'green'}/>
-                </Button>
-                <p className="text-step-1 font-heading">{props.name}</p>
+        <section className='bg-secondary p-s rounded-[8px]'>
+            <div className="flex items-center gap-m">   
+                    <Button className="p-0" variant="ghost" onClick={() => checkStatus(address)}>
+                        <RefreshCw color={loading ? 'grey' : !online ? 'red' : 'green'}/>
+                    </Button>
+                <div className="space-y-2xs">
+                    <div>
+                        <p className="text-step-0 font-heading">{props.name}</p>
+                        {props.description && <div className='text-step--1' dangerouslySetInnerHTML={{__html: props.description}}/>}
+                    </div>
 
-                <Switch 
-                    onClick={() => toggleWledOn(deviceState.toggle === 'on' ? 'off' : 'on')}
-                    checked={deviceState.toggle === 'on'}
-                />
-               
-        </div> 
-        </>
+                    <Switch 
+                        onClick={() => toggleWledOn(deviceState.toggle === 'on' ? 'off' : 'on')}
+                        checked={deviceState.toggle === 'on'}
+                    />
+                </div>
+                
+            </div> 
+        </section>
         
     )
 }

@@ -2,6 +2,7 @@ export interface IDevice {
     type: 'custom' | 'wled',
     name: string;
     address: string;
+    description?: string;
     state: {
         toggle?: 'on' | 'off';
         scale?: string
@@ -23,6 +24,7 @@ export const devices: {[key:string]: IDevice} = {
        type: 'wled',
        name: 'WLED Matrix',
        address: 'http://wled.local',
+       description: `<a href="http://wled.local/" target="_blank">wled.local</a>`,
        "state": {
             "toggle": "on",
        }
