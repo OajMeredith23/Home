@@ -1,2 +1,9 @@
-<h1>Welcome to SvelteKit</h1>
-<p>Visit <a href="https://svelte.dev/docs/kit">svelte.dev/docs/kit</a> to read the documentation</p>
+<script>
+	let { data } = $props();
+    import CustomDevice from '$lib/components/custom-device.svelte'
+</script>
+
+
+{#each Object.entries(data.devices) as device}
+    <CustomDevice deviceName={device[0]} {...device[1]}/>
+{/each}

@@ -1,3 +1,18 @@
 @import 'tailwindcss/base';
 @import 'tailwindcss/components';
 @import 'tailwindcss/utilities';
+
+
+:root {
+    --radius: 0.5rem;
+}
+
+body {
+    --font-body: 'Sora', sans-serif;
+    --font-heading: 'Sora', sans-serif;
+    font-family: var(--font-body);
+}
+
+h1, h2, h3, h4 {
+    @apply font-medium
+}
