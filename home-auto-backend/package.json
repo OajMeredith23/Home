@@ -2,7 +2,6 @@
   "name": "home-auto-backend",
   "version": "1.0.0",
   "main": "dist/index.js",
-  
   "scripts": {
     "build": "npx tsc",
     "start": "node dist/index.js",
@@ -18,7 +17,8 @@
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
     "express": "^4.21.1",
-    "node-fetch": "^3.3.2"
+    "node-fetch": "^3.3.2",
+    "socket.io": "^4.8.1"
   },
   "devDependencies": {
     "@types/cors": "^2.8.17",

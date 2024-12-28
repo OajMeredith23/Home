@@ -3,10 +3,15 @@ export interface IDevice {
     name: string;
     address: string;
     description?: string;
-    state: {
+    /** DEPRECATED DON'T /USE */
+    state?: {
         toggle?: 'on' | 'off';
         scale?: string
     }
+    controls: {
+        name: string;
+        type: 'toggle' | 'range'
+    }[]
 }
 
 export const devices: {[key:string]: IDevice} = {
@@ -15,10 +20,14 @@ export const devices: {[key:string]: IDevice} = {
        type: 'custom', 
        name: 'pico',
        address: 'http://192.168.1.12',
-       "state": {
-            "toggle": "on",
-            "scale": "0"
-       }
+       controls: [{
+        type: 'toggle',
+        name: 'toggle'
+       }]
+    //    "state": {
+    //         "toggle": "on",
+    //         "scale": "0"
+    //    }
    },  
     "wled_matrix": {
        type: 'wled',
@@ -27,7 +36,11 @@ export const devices: {[key:string]: IDevice} = {
        description: `<a href="http://wled.local/" target="_blank">wled.local</a>`,
        "state": {
             "toggle": "on",
-       }
+       },
+       controls: [{
+            type: 'toggle',
+            name: 'toggle',
+       }]
    },  
 //    "device_two": {
 //        name: 'made-up-thing',
